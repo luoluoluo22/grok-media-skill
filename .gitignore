@@ -1,0 +1,8 @@
+
+# Ignore data directory containing sensitive tokens
+libs/data/
+__pycache__/
+*.pyc
+.DS_Store
+output/
+generated_assets/
