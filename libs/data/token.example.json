@@ -5,5 +5,11 @@
             "status": "active",
             "remark": "Default Account"
         }
+    },
+    "ssoSuper": {
+        "OPTIONAL_SUPER_JWT": {
+            "status": "inactive",
+            "remark": "Super Account (Optional)"
+        }
     }
 }

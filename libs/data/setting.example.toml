@@ -1,4 +1,4 @@
 [grok]
 # Cloudflare Clearance Cookie (Optional, if needed)
-# cf_clearance="YOUR_CF_CLEARANCE_HERE"
-cf_clearance=""
+# If you encounter 403 errors, copy the 'cf_clearance' cookie from browser here.
+cf_clearance = ""
