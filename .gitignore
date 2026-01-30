@@ -1,6 +1,8 @@
 
 # Ignore data directory containing sensitive tokens
-libs/data/
+libs/data/*
+!libs/data/*.example.json
+!libs/data/*.example.toml
 __pycache__/
 *.pyc
 .DS_Store

@@ -12,6 +12,17 @@ description: 当用户需要生成图像、创建视频素材、让静态图片�
 - **AI 绘画**: 创建高清壁纸、视频封面、故事板、UI素材。
 - **AI 视频**: 制作动态背景、B-roll 空镜、让照片动起来 (Motion Brush)。
 
+## 环境配置 (Setup)
+首次使用前，请务必配置 Grok 的认证信息：
+
+1. 进入 `libs/data/` 目录。
+2. 复制 `token.example.json` 为 `token.json`。
+3. 复制 `setting.example.toml` 为 `setting.toml`。
+4. **获取 Token**:
+   - 登录 [grok.com](https://grok.com)。
+   - 打开浏览器开发者工具 (F12) -> Application -> Cookies。
+   - 找到 `sso` 或 `sso-rw` 的值，填入 `token.json` 中的 `YOUR_JWT_HERE` 位置。
+
 ## 功能与指令
 
 ### 1. 文生图 (Text to Image)

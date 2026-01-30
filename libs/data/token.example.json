@@ -1,0 +1,9 @@
+{
+    "desc": "Put your Grok SSO token here. Get it from browser cookies (sso-rw / sso).",
+    "ssoNormal": {
+        "YOUR_JWT_HERE": {
+            "status": "active",
+            "remark": "Default Account"
+        }
+    }
+}

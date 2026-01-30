@@ -1,0 +1,4 @@
+[grok]
+# Cloudflare Clearance Cookie (Optional, if needed)
+# cf_clearance="YOUR_CF_CLEARANCE_HERE"
+cf_clearance=""
