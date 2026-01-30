@@ -1,6 +1,6 @@
 ---
 name: grok-media-skill
-description: 当用户需要生成图像、创建视频素材、让静态图片动起来或进行任何 AIGC 视觉创作时使用此技能。
+description: 当用户明确指定使用 Grok 生成图像、创建视频素材、让静态图片动起来或进行任何 AIGC 视觉创作时使用此技能。
 ---
 
 # Grok Media Skill (AI 视觉创作)
