@@ -71,9 +71,8 @@ def generate_image_grok(prompt, ratio=None, count=1):
 
         print(f"[+] Generated {len(image_urls)} images. Downloading...")
         
-        # Save to current workspace asset dir or specified location
-        # Default to a local 'output' folder in the skill 
-        save_dir = current_dir.parent / "output"
+        # Save to user's current working directory
+        save_dir = Path(os.getcwd()) / "generated_assets"
         save_dir.mkdir(parents=True, exist_ok=True)
         
         local_files = []

@@ -138,7 +138,7 @@ def run_video_gen(post_id, file_id, prompt, cookie_str):
         
         if v_url:
             print(f"\n[+] Video generated! URL: {v_url}")
-            save_dir = current_dir.parent / "output"
+            save_dir = Path(os.getcwd()) / "generated_assets"
             save_dir.mkdir(parents=True, exist_ok=True)
             save_path = save_dir / f"video_{int(time.time())}.mp4"
             
