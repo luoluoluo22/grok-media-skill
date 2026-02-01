@@ -29,18 +29,29 @@ def generate_image_grok(prompt, ratio=None, count=1):
     if ratio:
         safe_prompt = f"{safe_prompt} --aspect {ratio}"
         
+    # 从 setting.toml 读取代理
+    from grok_client import SETTING_FILE
+    proxy = None
+    try:
+        import toml
+        data = toml.load(SETTING_FILE)
+        proxy = data.get("grok", {}).get("proxy_url")
+    except: pass
+    proxies = {"http": proxy, "https": proxy} if proxy else None
+
     print(f"[*] Sending prompt to Grok: '{safe_prompt}'")
+    print(f"[*] Using Proxy: {proxy}")
     
     payload = {
-        "temporary": True,
-        "modelName": "grok-3",
+        "temporary": False,
+        "modelName": "grok-4-1-thinking-1129",
         "message": safe_prompt, 
         "fileAttachments": [],
         "imageAttachments": [],
         "disableSearch": False,
         "enableImageGeneration": True,
         "imageGenerationCount": count,
-        "modelMode": "MODEL_MODE_FAST"
+        "modelMode": "MODEL_MODE_AUTO"
     }
 
     try:
@@ -50,7 +61,8 @@ def generate_image_grok(prompt, ratio=None, count=1):
             json=payload,
             impersonate="chrome133a",
             stream=True,
-            timeout=120
+            timeout=180,
+            proxies=proxies
         )
         
         image_urls = []
@@ -71,8 +83,10 @@ def generate_image_grok(prompt, ratio=None, count=1):
 
         print(f"[+] Generated {len(image_urls)} images. Downloading...")
         
-        # Save to user's current working directory
-        save_dir = Path(os.getcwd()) / "generated_assets"
+        # Save to user's project root directory
+        # current structure: <root>/.agent/skills/grok-media-skill/libs/
+        project_root = libs_path.parent.parent.parent.parent 
+        save_dir = project_root / "generated_assets"
         save_dir.mkdir(parents=True, exist_ok=True)
         
         local_files = []

@@ -23,14 +23,21 @@ except ImportError:
     sys.exit(1)
 
 def upload_image(image_input, cookie_str):
-    b64_content = ""
-    mime = "image/png"
-    
+    # 获取代理
+    from grok_client import SETTING_FILE
+    proxy = None
+    try:
+        import toml
+        data = toml.load(SETTING_FILE)
+        proxy = data.get("grok", {}).get("proxy_url")
+    except: pass
+    proxies = {"http": proxy, "https": proxy} if proxy else None
+
     # 逻辑：如果是 URL
     if image_input.startswith("http"):
         print(f"[*] Downloading reference image...")
         try:
-            r = requests.get(image_input, impersonate="chrome133a")
+            r = requests.get(image_input, impersonate="chrome133a", proxies=proxies)
             if r.status_code == 200:
                 mime = r.headers.get("content-type", "image/png")
                 b64_content = base64.b64encode(r.content).decode()
@@ -61,7 +68,7 @@ def upload_image(image_input, cookie_str):
         headers = get_headers(cookie_str, "/upload-file")
         resp = requests.post("https://grok.com/rest/app-chat/upload-file", 
                              headers=headers, 
-                             data=json.dumps(payload), impersonate="chrome133a")
+                             data=json.dumps(payload), impersonate="chrome133a", proxies=proxies)
         
         if resp.status_code == 200:
             d = resp.json()
@@ -77,11 +84,21 @@ def upload_image(image_input, cookie_str):
 
 def create_post(file_uri, cookie_str):
     print("[*] Creating Media Post anchor...")
+    # 获取代理
+    from grok_client import SETTING_FILE
+    proxy = None
+    try:
+        import toml
+        data = toml.load(SETTING_FILE)
+        proxy = data.get("grok", {}).get("proxy_url")
+    except: pass
+    proxies = {"http": proxy, "https": proxy} if proxy else None
+
     payload = {"media_url": f"https://assets.grok.com/{file_uri}", "media_type": "MEDIA_POST_TYPE_IMAGE"}
     try:
         resp = requests.post("https://grok.com/rest/media/post/create", 
                              headers=get_headers(cookie_str, "/create"), 
-                             json=payload, impersonate="chrome133a")
+                             json=payload, impersonate="chrome133a", proxies=proxies)
         if resp.status_code == 200:
             pid = resp.json().get("post", {}).get("id")
             return pid
@@ -94,13 +111,23 @@ def create_post(file_uri, cookie_str):
 def run_video_gen(post_id, file_id, prompt, cookie_str):
     print(f"[*] Requesting video generation (This takes 1-2 mins)...")
     
+    # 从 setting.toml 读取代理
+    from grok_client import SETTING_FILE
+    proxy = None
+    try:
+        import toml
+        data = toml.load(SETTING_FILE)
+        proxy = data.get("grok", {}).get("proxy_url")
+    except: pass
+    proxies = {"http": proxy, "https": proxy} if proxy else None
+
     payload = {
-        "temporary": True,
-        "modelName": "grok-3",
+        "temporary": False,
+        "modelName": "grok-4-1-thinking-1129",
         "message": f"https://grok.com/imagine/{post_id} {prompt} --mode=custom",
         "fileAttachments": [file_id] if file_id else [],
         "toolOverrides": {"videoGen": True},
-        "modelMode": "MODEL_MODE_FAST"
+        "modelMode": "MODEL_MODE_AUTO"
     }
 
     headers = get_headers(cookie_str)
@@ -109,7 +136,12 @@ def run_video_gen(post_id, file_id, prompt, cookie_str):
     try:
         response = requests.post(
             "https://grok.com/rest/app-chat/conversations/new",
-            headers=headers, json=payload, impersonate="chrome133a", stream=True, timeout=300 
+            headers=headers, 
+            json=payload, 
+            impersonate="chrome133a", 
+            stream=True, 
+            timeout=300,
+            proxies=proxies 
         )
         
         last_p = -1
@@ -119,6 +151,9 @@ def run_video_gen(post_id, file_id, prompt, cookie_str):
             if not line: continue
             try:
                 line_str = line.decode('utf-8')
+                if "<html" in line_str.lower():
+                    print("\n[!] Cloudflare Security Challenge Detected.")
+                    break
                 data = json.loads(line_str)
                 
                 if "error" in data:
@@ -138,7 +173,9 @@ def run_video_gen(post_id, file_id, prompt, cookie_str):
         
         if v_url:
             print(f"\n[+] Video generated! URL: {v_url}")
-            save_dir = Path(os.getcwd()) / "generated_assets"
+            # current structure: <root>/.agent/skills/grok-media-skill/libs/
+            project_root = libs_path.parent.parent.parent.parent
+            save_dir = project_root / "generated_assets"
             save_dir.mkdir(parents=True, exist_ok=True)
             save_path = save_dir / f"video_{int(time.time())}.mp4"
             
@@ -147,7 +184,7 @@ def run_video_gen(post_id, file_id, prompt, cookie_str):
             if "x-statsig-id" in dl_headers:
                 del dl_headers["x-statsig-id"] 
             
-            r_dl = requests.get(f"https://assets.grok.com/{v_url}", headers=dl_headers, impersonate="chrome133a")
+            r_dl = requests.get(f"https://assets.grok.com/{v_url}", headers=dl_headers, impersonate="chrome133a", proxies=proxies)
             if r_dl.status_code == 200:
                 save_path.write_bytes(r_dl.content)
                 print(f"[V] Saved video: {save_path}")

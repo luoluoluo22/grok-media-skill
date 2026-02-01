@@ -1,4 +1,24 @@
 [grok]
-# Cloudflare Clearance Cookie (Optional, if needed)
-# If you encounter 403 errors, copy the 'cf_clearance' cookie from browser here.
+# 必填：用于防拦截的 User-Agent，建议通过浏览器控制台 navigator.userAgent 获取
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
+
+# 选填：用于绕过 Cloudflare 的 Cookie
 cf_clearance = ""
+
+# 强烈建议：填入浏览器中的完整 Cookie 字符串 (包含 cf_clearance, sso-rw, _ga 等)
+cookie = ""
+
+# 代理配置：若浏览器使用了代理，此处必须填入相同的地址以保持 IP 一致
+proxy_url = "http://127.0.0.1:7890"
+
+# 动态 Statsig 特征，建议设为 true
+dynamic_statsig = true
+
+# 生成参数
+temporary = false
+show_thinking = true
+
+[global]
+log_level = "INFO"
+# 图片保存模式: "url" 或 "base64"
+image_mode = "url"
